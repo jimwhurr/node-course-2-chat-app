@@ -24,17 +24,15 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('newMessage', generateMessage('Admin','New user joined'));
 
     socket.on('createMessage', (message, callback) => {
-        console.log('createMessage', message);
 
         // use io.emit to emit event to all connections!
         io.emit('newMessage', generateMessage(message.from, message.text));
 
-        // invoke callback to ackowledge the event
-        callback('Server ACK');
+        // invoke callback to ackowledge the event (can take string as arg)
+        callback();
     });
 
     socket.on('createLocationMessage', (coords) => {
-        console.log('#createLocationMessage');
         io.emit('newLocationMessage', generateLocationMessage('Jim', coords.latitude, coords.longitude));
     }); 
     
