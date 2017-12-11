@@ -3,7 +3,7 @@ const socketIO = require('socket.io');
 const path = require('path');
 const http = require('http');
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -31,13 +31,12 @@ io.on('connection', (socket) => {
 
         // invoke callback to ackowledge the event
         callback('Server ACK');
-
-        // socket.broadcast.emit('newMessage', {
-        //     from: message.from,
-        //     text: message.text,
-        //     createdAt: Date.now()
-        // });
     });
+
+    socket.on('createLocationMessage', (coords) => {
+        console.log('#createLocationMessage');
+        io.emit('newLocationMessage', generateLocationMessage('Jim', coords.latitude, coords.longitude));
+    }); 
     
     socket.on('disconnect', () => {
         console.log('User was disconnected');
