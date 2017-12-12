@@ -9,29 +9,28 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(message) {
-    // format the timesatmp
-    const formattedTime = moment(message.CreatedAt).format('h:mm a');
+    const timestamp = moment(message.CreatedAt).format('h:mm a');
+    const template = jQuery('#message-template').html();
+    const html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createdAt: timestamp
+    });
 
-    // create an element to list messages
-    const li = jQuery('<li></li>');
-
-    // list latest message
-    li.text(`${message.from} ${formattedTime}: ${message.text}`);
-
-    // insert element in the DOM
-    jQuery('#messages').append(li);
+    jQuery('#messages').append(html);
 });
 
 socket.on('newLocationMessage', function (message) {
-        var li = jQuery('<li></li>');
-        var a = jQuery('<a target="_blank">My current location</a>');
-
-        const timestamp = moment(message.CreatedAt).format('h:mm a');
-        li.text(`${message.from} ${timestamp}: `);
-        a.attr('href', message.url);
-        li.append(a);
-        jQuery('#messages').append(li);
+    const timestamp = moment(message.CreatedAt).format('h:mm a');
+    const template = jQuery('#location-message-template').html();
+    const html = Mustache.render(template, {
+        from: message.from,
+        url: message.url,
+        createdAt: timestamp
     });
+
+    jQuery('#messages').append(html);
+});
 
 // add event listener to the form
 jQuery('#message-form').on('submit', function(e) {
