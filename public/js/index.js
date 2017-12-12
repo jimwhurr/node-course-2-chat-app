@@ -9,10 +9,14 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(message) {
+    // format the timesatmp
+    const formattedTime = moment(message.CreatedAt).format('h:mm a');
+
     // create an element to list messages
     const li = jQuery('<li></li>');
+
     // list latest message
-    li.text(`${message.from}: ${message.text}`);
+    li.text(`${message.from} ${formattedTime}: ${message.text}`);
 
     // insert element in the DOM
     jQuery('#messages').append(li);
@@ -22,7 +26,8 @@ socket.on('newLocationMessage', function (message) {
         var li = jQuery('<li></li>');
         var a = jQuery('<a target="_blank">My current location</a>');
 
-        li.text(`${message.from}: `);
+        const timestamp = moment(message.CreatedAt).format('h:mm a');
+        li.text(`${message.from} ${timestamp}: `);
         a.attr('href', message.url);
         li.append(a);
         jQuery('#messages').append(li);
