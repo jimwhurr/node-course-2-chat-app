@@ -45,10 +45,6 @@ io.on('connection', (socket) => {
         // inform arrival to users in the room
         io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
-        // socket.leave()    
-        // io.emit()  -- all users                          room: io.to(params.room).emit()
-        // socket.broadcast.emit() -- all but the sender    room: socket.broadcast.to...
-
         // socket.emit(); -- to one user
         socket.emit('newMessage', generateMessage('Admin','Welcome to the chat app'));
         socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin',`${params.name} has joined`));
@@ -57,15 +53,29 @@ io.on('connection', (socket) => {
 
     socket.on('createMessage', (message, callback) => {
 
-        // use io.emit to emit event to all connections!
-        io.emit('newMessage', generateMessage(message.from, message.text));
+        // get user record based on socket.id
+        const user = users.getUser(socket.id);
+
+        // if user exists and text is a string
+        if (user && isRealString(message.text)) {
+            // use io.emit to emit event to all connections!
+            io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));       
+        }
 
         // invoke callback to ackowledge the event (can take string as arg)
         callback();
     });
 
     socket.on('createLocationMessage', (coords) => {
-        io.emit('newLocationMessage', generateLocationMessage('Jim', coords.latitude, coords.longitude));
+
+        // get user record based on socket.id
+        const user = users.getUser(socket.id);
+        
+        // if user exists and text is a string
+        if (user) {
+            // use io.emit to emit event to all connections!
+            io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
+        }        
     }); 
     
     socket.on('disconnect', () => {
